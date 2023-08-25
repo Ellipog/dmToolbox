@@ -85,7 +85,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-[#a08f82] shadow-md rounded px-8 pt-6 pb-8 text-black h-screen flex justify-center items-center">
+    <div className="bg-[#a08f82] rounded px-8 pt-6 pb-8 text-black h-screen flex justify-center items-center shadow-2xl">
       <div className="h-5/6 w-1/3 bg-[#e3ded9] p-8 rounded">
         <section>
           <h1 className="text-4xl mb-2 text-[#800200]">{monster.name}</h1>
