@@ -224,7 +224,7 @@ export default function Home() {
       </div>
 
       {monster.actions[0] && (
-        <div className="flex flex-col w-1/4 h-5/6 gap-5 overflow-scroll bg-[#e3ded9] rounded p-5">
+        <div className="flex flex-col w-1/4 h-5/6 gap-5 overflow-scroll bg-[#e3ded9] rounded p-5 shadow">
           {monster.actions[0].name == "Multiattack" && (
             <div className="w-full bg-[#d6cfc9] p-8 rounded">
               <section>
@@ -261,7 +261,10 @@ export default function Home() {
               )
               .map((actions, i) => {
                 return (
-                  <div className="w-full bg-[#d6cfc9] p-8 rounded" key={i}>
+                  <div
+                    className="w-full bg-[#d6cfc9] p-8 rounded shadow"
+                    key={i}
+                  >
                     <section>
                       <h1 className="text-2xl mb-2 text-[#432524]">
                         {actions.name}
@@ -273,7 +276,7 @@ export default function Home() {
                     <hr className="border-[#800200] mb-5 mt-5" />
                     {actions.damage &&
                       actions.damage.length > 0 &&
-                      actions.damage[0].name !== "" && (
+                      actions.damage[0].damage_type && (
                         <div className="flex row gap-2">
                           <p className="font-bold">
                             {actions.damage[0].damage_type.name}:
