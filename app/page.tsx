@@ -38,6 +38,7 @@ interface Monster {
   languages: string;
   senses: Sense;
   xp: number;
+  actions: Array<any>;
 }
 
 export default function Home() {
@@ -85,8 +86,8 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-[#a08f82] rounded px-8 pt-6 pb-8 text-black h-screen flex justify-center items-center shadow-2xl">
-      <div className="h-5/6 w-1/3 bg-[#e3ded9] p-8 rounded">
+    <div className="bg-[#a08f82] px-8 pt-6 pb-8 text-black h-screen flex justify-center items-center shadow-2xl row gap-24">
+      <div className="h-5/6 w-1/3 bg-[#e3ded9] p-8 rounded overflow-scroll">
         <section>
           <h1 className="text-4xl mb-2 text-[#800200]">{monster.name}</h1>
           <div className="flex row gap-1">
@@ -220,8 +221,85 @@ export default function Home() {
           <p className="font-bold">XP:</p>
           <p className="text-base">{monster.xp}</p>
         </div>
-        <hr className="border-[#800200] mb-5 mt-5" />
       </div>
+
+      {monster.actions[0] && (
+        <div className="flex flex-col w-1/4 h-5/6 gap-5 overflow-scroll bg-[#e3ded9] rounded p-5">
+          {monster.actions[0].name == "Multiattack" && (
+            <div className="w-full bg-[#d6cfc9] p-8 rounded">
+              <section>
+                <h1 className="text-2xl mb-2 text-[#432524]">
+                  {monster.actions[0].name}
+                </h1>
+                <div className="flex row gap-1 font-light">
+                  {monster.actions[0].desc}
+                </div>
+              </section>
+              <hr className="border-[#800200] mb-5 mt-5" />
+              {monster.actions[0].actions[0] !== undefined &&
+                Object.values(monster.actions[0].actions).map(
+                  (actions: any, i) => {
+                    return (
+                      <div className="flex row gap-2" key={i}>
+                        <p className="font-bold">{actions.action_name}:</p>
+                        <div className="flex row gap-2">
+                          <div className="text-base mb-2 flex row gap-1">
+                            {actions.count}
+                            <p className="font-extralight">({actions.type})</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                )}
+            </div>
+          )}
+          {monster.actions[0].name !== "" &&
+            Object.values(monster.actions)
+              .filter(
+                (action, index) => index > 0 || action.name !== "Multiattack"
+              )
+              .map((actions, i) => {
+                return (
+                  <div className="w-full bg-[#d6cfc9] p-8 rounded" key={i}>
+                    <section>
+                      <h1 className="text-2xl mb-2 text-[#432524]">
+                        {actions.name}
+                      </h1>
+                      <div className="flex row gap-1 font-light">
+                        {actions.desc}
+                      </div>
+                    </section>
+                    <hr className="border-[#800200] mb-5 mt-5" />
+                    {actions.damage &&
+                      actions.damage.length > 0 &&
+                      actions.damage[0].name !== "" && (
+                        <div className="flex row gap-2">
+                          <p className="font-bold">
+                            {actions.damage[0].damage_type.name}:
+                          </p>
+                          <p className="text-base mb-2">
+                            {actions.damage[0].damage_dice}
+                          </p>
+                        </div>
+                      )}
+                    {actions.damage &&
+                      actions.damage.length > 0 &&
+                      actions.damage[1] && (
+                        <div className="flex row gap-2">
+                          <p className="font-bold">
+                            {actions.damage[1].damage_type.name}:
+                          </p>
+                          <p className="text-base mb-2">
+                            {actions.damage[1].damage_dice}
+                          </p>
+                        </div>
+                      )}
+                  </div>
+                );
+              })}
+        </div>
+      )}
     </div>
   );
 }
