@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark, faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
 
 interface Sense {
   passive_perception: number;
@@ -65,7 +67,12 @@ export default function Home() {
   };
 
   const fetchMonsterData = (monsterData: any) => {
-    monsterData = monsterData.replace(/\s/g, "-");
+    monsterData = monsterData
+      .replace(/\s/g, "-")
+      .toLowerCase()
+      .replace(/,/g, "") // make it also replace capital with lowercase and remove " form" and commas
+      .replace("-form", "");
+
     fetch(`https://www.dnd5eapi.co/api/monsters/${monsterData}`) // changed the API to open5e
       .then((response) => response.json())
       .then((data) => {
@@ -80,8 +87,8 @@ export default function Home() {
           monsterData.climbspeed = data.speed.climb;
           monsterData.flyspeed = data.speed.fly;
           monsterData.swimspeed = data.speed.swim;
-          monsterData.id = Math.floor(Math.random() * 900000000) + 100000000;
           setMonster(monsterData);
+          console.log(monsterData.index);
         } else {
           setFound(false);
         }
@@ -93,16 +100,21 @@ export default function Home() {
   };
 
   const saveMonster = () => {
-    const savedMonsters = JSON.parse(Cookies.get("savedMonsters") || "[]");
-
     if (monster) {
-      const monsterWithId = { id: monster.id, name: monster.name };
-      savedMonsters.push(monsterWithId);
-      Cookies.set("savedMonsters", JSON.stringify(savedMonsters));
-      setSavedMonsterCookies(savedMonsters); // Update savedMonsterCookies
-    }
+      monster.id = Math.floor(Math.random() * 900000000) + 100000000;
+      const savedMonsters = JSON.parse(Cookies.get("savedMonsters") || "[]");
 
-    console.log(JSON.parse(Cookies.get("savedMonsters") || "[]"));
+      if (monster) {
+        const monsterWithId = {
+          id: monster.id,
+          name: monster.name,
+          index: monster.index,
+        };
+        savedMonsters.push(monsterWithId);
+        Cookies.set("savedMonsters", JSON.stringify(savedMonsters));
+        setSavedMonsterCookies(savedMonsters); // Update savedMonsterCookies
+      }
+    }
   };
 
   const clearMonster = (id: any) => {
@@ -132,7 +144,6 @@ export default function Home() {
 
   useEffect(() => {
     setSavedMonsterCookies(JSON.parse(Cookies.get("savedMonsters") || "[]"));
-    console.log(savedMonsterCookies);
   }, [monster]);
 
   if (!monster) {
@@ -153,7 +164,7 @@ export default function Home() {
   return (
     <div className="bg-[#a08f82] px-8 pt-6 pb-8 text-black h-screen flex justify-center items-center shadow-2xl row gap-24">
       <div className="w-1/5 h-5/6 flex flex-col gap-10">
-        <div className="h-4/6">
+        <div className="h-3/5">
           <textarea
             className="w-full h-full bg-[#e3ded9] rounded p-4"
             placeholder="Notes..."
@@ -162,8 +173,8 @@ export default function Home() {
             style={{ resize: "none" }}
           />
         </div>
-        <div className="h-2/6">
-          <div className="w-full h-full bg-[#e3ded9] rounded p-4 grid-flow-col">
+        <div className="h-2/5" style={{ maxHeight: "35%" }}>
+          <div className="w-full h-full bg-[#e3ded9] rounded p-4 flex flex-col gap-2">
             <div className="flex gap-3">
               <input
                 className="w-full rounded bg-[#f3f2f0] p-1"
@@ -178,19 +189,33 @@ export default function Home() {
                 }}
               />
               <button
-                className="w-3/6 rounded bg-[#f3f2f0] p-1"
+                className="w-3/6 rounded bg-[#f3f2f0] p-1 ransition-all hover:bg-[#eeede9]"
                 onClick={() => fetchRandomMonster()}
               >
                 Random
               </button>
             </div>
-            <div className="overflow-scroll w-full">
+            <div className="overflow-scroll h-[95%] w-full">
               {Object.values(savedMonsterCookies).map((monster, i) => {
                 return (
-                  <div className="flex row gap-3 mt-2" key={i}>
-                    <p className="font-bold">{monster.name}:</p>
-                    <p className="text-base">{monster.id}</p>
-                    <button onClick={() => clearMonster(monster.id)}>X</button>
+                  <div
+                    className="flex row gap-3 mt-2 justify-between w-full bg-[#d5cec7] px-2 py-1 rounded cursor-pointer transition-all hover:bg-[#ccc4bb]"
+                    key={i}
+                    onClick={() => fetchMonsterData(monster.index)}
+                  >
+                    <p className="font-medium">{monster.name}</p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearMonster(monster.id);
+                      }}
+                      className="text-l h-full w-1/12"
+                    >
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        className="hover:animate-pulse"
+                      />
+                    </button>
                   </div>
                 );
               })}
@@ -215,20 +240,15 @@ export default function Home() {
       {found && monster && (
         <div className="h-5/6 w-1/3 bg-[#e3ded9] p-8 rounded overflow-scroll">
           <section>
-            <h1 className="text-4xl mb-2 text-[#800200]">ss{monster.name}</h1>
-            <button
-              onClick={() => saveMonster()}
-              className="h-8 bg-black text-white"
-            >
-              Save Monster
-            </button>
-            <button
-              onClick={() => clearMonster(monster.id)}
-              className="h-8 bg-red-400 text-white"
-            >
-              Clear Monster
-            </button>
+            <h1 className="text-4xl mb-2 text-[#800200]">{monster.name}</h1>
+
             <div className="flex row gap-1">
+              <button onClick={() => saveMonster()}>
+                <FontAwesomeIcon
+                  icon={faFloppyDisk}
+                  className="hover:text-[#800200] transition-all800200 text-xl mr-1"
+                />
+              </button>
               {monster.size} {monster.type},
               <p className="font-thin">{monster.alignment}</p>
             </div>
