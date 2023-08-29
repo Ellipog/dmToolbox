@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faFloppyDisk } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "react-hot-toast";
 
 interface Sense {
   passive_perception: number;
@@ -89,13 +90,16 @@ export default function Home() {
           monsterData.swimspeed = data.speed.swim;
           setMonster(monsterData);
           console.log(monsterData.index);
+          toast.promise;
+          toast.success("Monster loaded!");
         } else {
           setFound(false);
+          toast.error("Monster not found...");
         }
       })
       .catch((error) => {
-        console.error("Error fetching monster data:", error);
         setFound(false);
+        toast.error("Monster not found...");
       });
   };
 
@@ -113,6 +117,7 @@ export default function Home() {
         savedMonsters.push(monsterWithId);
         Cookies.set("savedMonsters", JSON.stringify(savedMonsters));
         setSavedMonsterCookies(savedMonsters); // Update savedMonsterCookies
+        toast.success("Monster saved!");
       }
     }
   };
@@ -127,6 +132,7 @@ export default function Home() {
 
       Cookies.set("savedMonsters", JSON.stringify(updatedMonsters));
       setSavedMonsterCookies(updatedMonsters); // Update savedMonsterCookies
+      toast.success("Monster deleted!");
     }
   };
 
