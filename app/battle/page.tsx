@@ -13,7 +13,7 @@ export default function Home() {
   const [battleList, setBattleList] = useState<any[]>([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const pickerRef = useRef<HTMLDivElement | null>(null);
-  const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [selectedEmoji, setSelectedEmoji] = useState("🫥");
   const [name, setName] = useState("");
   const [health, setHealth] = useState("");
   const [initiative, setInitiative] = useState("");
@@ -42,7 +42,7 @@ export default function Home() {
     setName("");
     setHealth("");
     setInitiative("");
-    setSelectedEmoji("");
+    setSelectedEmoji("🫥");
     toast.success("Character added!");
   };
 
@@ -89,7 +89,9 @@ export default function Home() {
                   <div className="flex justify-center items-center flex-col">
                     <p className="text-[80px]">{char.emoji}</p>
                     <p className="font-bold relative top-[-20px]">
-                      {char.name}
+                      {char.name.length > 9
+                        ? `${char.name.slice(0, 9)}..`
+                        : char.name}
                     </p>
                   </div>
                 </div>
