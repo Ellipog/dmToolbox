@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-hot-toast";
 
 export default function Home() {
@@ -90,7 +90,7 @@ export default function Home() {
                       e.stopPropagation();
                       removeCharacter(char.id);
                     }}
-                    className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold"
+                    className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold z-50"
                   >
                     DELETE
                   </button>
