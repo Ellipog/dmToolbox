@@ -12,7 +12,6 @@ import { toast } from "react-hot-toast";
 export default function Home() {
   const [battleList, setBattleList] = useState<any[]>([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const pickerRef = useRef<HTMLDivElement | null>(null);
   const [selectedEmoji, setSelectedEmoji] = useState("🫥");
   const [name, setName] = useState("");
   const [health, setHealth] = useState("");
@@ -72,56 +71,120 @@ export default function Home() {
     <div className="bg-[#a08f82] text-black h-screen w-screen flex flex-col justify-center items-center gap-24">
       <Navbar page="home" />
       {!battleStatus && (
-        <div className="flex row justify-center items-center gap-5 fixed top-[12vh]">
-          {Object.values(battleList)
-            .sort((a, b) => b.initiative - a.initiative)
-            .map((char, i) => {
-              const characterNumber = i + 1; // Declare and assign the character number
-              char.characterNumber = characterNumber; // Add the character number to the char object
-              updatedBattleList.push(char); // Push the updated char object to the updatedBattleList
-              console.log(char.name, updatedBattleList[i].characterNumber);
-              return (
-                <div
-                  className="flex justify-center items-center flex-col"
-                  key={i}
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeCharacter(char.id);
-                    }}
-                    className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold z-50"
-                  >
-                    DELETE
-                  </button>
+        <div className="flex flex-col justify-center items-center w-screen fixed top-[4vh]">
+          <div className="flex row justify-center items-center gap-5 fixed top-[12vh] overflow-x-scroll overflow-y-hidden w-screen">
+            {Object.values(battleList)
+              .sort((a, b) => b.initiative - a.initiative)
+              .map((char, i) => {
+                const characterNumber = i + 1; // Declare and assign the character number
+                char.characterNumber = characterNumber; // Add the character number to the char object
+                updatedBattleList.push(char); // Push the updated char object to the updatedBattleList
+                return (
                   <div
-                    className="flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l"
+                    className="flex justify-center items-center flex-col"
                     key={i}
                   >
-                    <div className="flex justify-center items-center flex-col">
-                      <p className="text-[80px]">{char.emoji}</p>
-                      <p className="font-bold relative top-[-20px]">
-                        {char.name.length > 9
-                          ? `${char.name.slice(0, 9)}..`
-                          : char.name}
-                      </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeCharacter(char.id);
+                      }}
+                      className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold z-50 text-[#636261]"
+                    >
+                      DELETE
+                    </button>
+                    <div
+                      className="flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l"
+                      key={i}
+                    >
+                      <div className="flex justify-center items-center flex-col">
+                        <p className="text-[80px]">{char.emoji}</p>
+                        <p className="font-bold relative top-[-20px] text-[#636261]">
+                          {char.name.length > 9
+                            ? `${char.name.slice(0, 9)}..`
+                            : char.name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3 text-[#636261]">
+                      {char.initiative}
                     </div>
                   </div>
-                  <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3">
-                    {char.initiative}
-                  </div>
-                </div>
-              );
-            })}
-          <div className="flex flex-col justify-center items-center w-32 h-32 rounded cursor-default shadow-l">
-            <div className="flex justify-center items-center flex-col">
-              <button
-                className="font-light text-8xl text-[#636261] hover:text-[#383737] transition-all"
-                onClick={() => setOpenEditor(!openEditor)}
-              >
-                +
-              </button>
+                );
+              })}
+            <div className="flex flex-col justify-center items-center w-32 h-32 rounded cursor-default shadow-l">
+              <div className="flex justify-center items-center flex-col">
+                <button
+                  className="font-light text-8xl text-[#636261] hover:text-[#383737] transition-all"
+                  onClick={() => setOpenEditor(!openEditor)}
+                >
+                  +
+                </button>
+              </div>
             </div>
+          </div>
+          <div
+            className="flex flex-col justify-center items-center w-1/12 h-12 bg-[#d5cec7] rounded shadow-l transition-all hover:bg-[#c8c1b9] cursor-pointer font-semibold text-xl text-[#636261]"
+            onClick={() => {
+              setBattleStatus(!battleStatus);
+              setOpenEditor(false);
+            }}
+          >
+            START
+          </div>
+        </div>
+      )}
+      {battleStatus && (
+        <div className="flex flex-col justify-center items-center w-screen fixed top-[4vh]">
+          <div className="flex row justify-center items-center gap-5 fixed top-[12vh] overflow-x-scroll overflow-y-hidden w-screen">
+            {Object.values(battleList)
+              .sort((a, b) => b.initiative - a.initiative)
+              .map((char, i) => {
+                const characterNumber = i + 1; // Declare and assign the character number
+                char.characterNumber = characterNumber; // Add the character number to the char object
+                updatedBattleList.push(char); // Push the updated char object to the updatedBattleList
+                return (
+                  <div
+                    className="flex justify-center items-center flex-col"
+                    key={i}
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeCharacter(char.id);
+                      }}
+                      className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold z-50 text-[#636261]"
+                    >
+                      DELETE
+                    </button>
+                    <div
+                      className="flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l"
+                      key={i}
+                    >
+                      <div className="flex justify-center items-center flex-col">
+                        <p className="text-[80px]">{char.emoji}</p>
+                        <p className="font-bold relative top-[-20px] text-[#636261]">
+                          {char.name.length > 9
+                            ? `${char.name.slice(0, 9)}..`
+                            : char.name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3 text-[#636261]">
+                      {char.initiative}
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+          <div
+            className="flex flex-col justify-center items-center w-1/12 h-12 bg-[#d5cec7] rounded shadow-l transition-all hover:bg-[#c8c1b9] cursor-pointer font-semibold text-xl text-[#636261]"
+            onClick={() => {
+              setBattleStatus(!battleStatus);
+              setOpenEditor(false);
+            }}
+          >
+            TURN 1<p className="text-[7px] fixed top-[6.5vh]">CLICK TO STOP</p>
           </div>
         </div>
       )}
@@ -138,12 +201,9 @@ export default function Home() {
               <div className="flex w-3/12 h-full justify-center items-center">
                 <div
                   className="w-28 h-28 text-[80px] flex justify-center items-center bg-[#f3f2f0] rounded cursor-pointer"
-                  placeholder="😁"
                   onClick={() => {
                     setIsPickerOpen(true);
                   }}
-                  style={{ outline: "none" }}
-                  onInput={handleEmojiInputChange}
                 >
                   {selectedEmoji}
                 </div>
@@ -205,7 +265,7 @@ export default function Home() {
       )}
       <div className="fixed">
         {isPickerOpen && (
-          <div ref={pickerRef} onClick={(event) => event.stopPropagation()}>
+          <div onClick={(event) => event.stopPropagation()}>
             <Picker
               data={data}
               className="fixed top-5"
