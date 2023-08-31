@@ -107,7 +107,7 @@ export default function Home() {
                       </p>
                     </div>
                   </div>
-                  <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl fixed top-[24.75vh]">
+                  <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3">
                     {char.initiative}
                   </div>
                 </div>
