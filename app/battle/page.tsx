@@ -236,11 +236,29 @@ export default function Home() {
               <FontAwesomeIcon icon={faArrowRight} />
             </button>
           </div>
-          <div className="fixed left-50 top-[35vh] flex flex-col justify-center items-center w-2/4 h-[50vh] bg-[#d5cec7] rounded shadow-l">
-            {sortedBattleList[currentCharacter].name}{" "}
-            {sortedBattleList[currentCharacter].health}{" "}
-            {sortedBattleList[currentCharacter].initiative}{" "}
-            {sortedBattleList[currentCharacter].emoji}
+          <div className="fixed left-50 top-[35vh] flex row gap-6 justify-center items-center w-2/4 h-[50vh] text-[#636261]">
+            <div className="flex flex-col justify-top items-center w-1/4 h-full bg-[#d5cec7] rounded shadow-l">
+              <p className="text-[11rem]">
+                {sortedBattleList[currentCharacter].emoji}
+              </p>
+              <p className="text-2xl -mt-10">
+                {sortedBattleList[currentCharacter].name}{" "}
+              </p>
+              <div className="flex justify-top items-start w-5/6 flex-col">
+                <p className="text-[#800200] font-semibold mt-2">Health:</p>
+                <p className="ml-2">
+                  14/{sortedBattleList[currentCharacter].health}{" "}
+                </p>
+                <p className="text-[#800200] font-semibold mt-2">Initiative:</p>
+                <p className="ml-2">
+                  {sortedBattleList[currentCharacter].initiative}{" "}
+                </p>
+                <p className="text-[#800200] font-semibold mt-2">
+                  Status Effects:
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col justify-center items-center w-3/4 h-full bg-[#d5cec7] rounded shadow-l"></div>
           </div>
         </div>
       )}

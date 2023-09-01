@@ -177,7 +177,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-[#a08f82] px-8 pt-6 pb-8 text-black h-screen w-screen flex flex-row justify-center items-center gap-24">
+    <div className="bg-[#a08f82] px-8 pt-6 pb-8 h-screen w-screen flex flex-row justify-center items-center gap-24 text-[#636261]">
       <Navbar page="monsters" />
       <div className="w-1/5 h-5/6 flex flex-col gap-10">
         <div className="h-2/5">
