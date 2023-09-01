@@ -18,6 +18,8 @@ export default function Home() {
   const [initiative, setInitiative] = useState("");
   const [battleStatus, setBattleStatus] = useState(false);
   const [openEditor, setOpenEditor] = useState(false);
+  const [currentCharacter, setCurrentCharacter] = useState(0);
+  const [currentTurn, setCurrentTurn] = useState(1);
 
   const handleEmojiInputChange = (event: any) => {
     setSelectedEmoji(event.target.textContent);
@@ -66,6 +68,16 @@ export default function Home() {
   }, [Cookies.get("characters")]);
 
   let updatedBattleList: any = [];
+  const handleClick = () => {
+    setCurrentCharacter((prevCharacter) => {
+      console.log("HELLO", battleList.length);
+      if (prevCharacter === battleList.length - 1) {
+        setCurrentTurn((prevTurn) => prevTurn + 1);
+      }
+      const totalCharacters = battleList.length;
+      return (prevCharacter + 1) % totalCharacters;
+    });
+  };
 
   return (
     <div className="bg-[#a08f82] text-black h-screen w-screen flex flex-col justify-center items-center gap-24">
@@ -140,12 +152,17 @@ export default function Home() {
             {Object.values(battleList)
               .sort((a, b) => b.initiative - a.initiative)
               .map((char, i) => {
-                const characterNumber = i + 1; // Declare and assign the character number
-                char.characterNumber = characterNumber; // Add the character number to the char object
-                updatedBattleList.push(char); // Push the updated char object to the updatedBattleList
+                const characterNumber = i + 1;
+                char.characterNumber = characterNumber;
+                updatedBattleList.push(char);
+
+                const isActiveCharacter = i === currentCharacter; // Check if it's the current turn character
+
                 return (
                   <div
-                    className="flex justify-center items-center flex-col"
+                    className={`flex justify-center items-center flex-col ${
+                      isActiveCharacter ? "bg-[#3d3d3d]" : ""
+                    } `}
                     key={i}
                   >
                     <button
@@ -173,6 +190,7 @@ export default function Home() {
                     <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3 text-[#636261]">
                       {char.initiative}
                     </div>
+                    <button onClick={handleClick}>Next Character</button>
                   </div>
                 );
               })}
@@ -184,7 +202,8 @@ export default function Home() {
               setOpenEditor(false);
             }}
           >
-            TURN 1<p className="text-[7px] fixed top-[6.5vh]">CLICK TO STOP</p>
+            TURN {currentTurn}
+            <p className="text-[7px] fixed top-[6.5vh]">CLICK TO STOP</p>
           </div>
         </div>
       )}
