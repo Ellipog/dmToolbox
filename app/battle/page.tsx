@@ -20,6 +20,8 @@ export default function Home() {
   const [openEditor, setOpenEditor] = useState(false);
   const [currentCharacter, setCurrentCharacter] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(1);
+  const [statusName, setStatusName] = useState("");
+  const [amountOfTurns, setAmountOfTurns] = useState("");
 
   const handleEmojiInputChange = (event: any) => {
     setSelectedEmoji(event.target.textContent);
@@ -95,7 +97,19 @@ export default function Home() {
     });
   };
 
-  console.log(battleList);
+  const addStatusEffect = () => {
+    const character = sortedBattleList[currentCharacter];
+    if (!character.statusEffects) {
+      character.statusEffects = []; // Initialize the statusEffects array if it doesn't exist
+    }
+    const newStatusEffect = {
+      name: statusName,
+      turns: parseInt(amountOfTurns),
+    };
+    character.statusEffects.push(newStatusEffect);
+    setStatusName("");
+    setAmountOfTurns("");
+  };
 
   return (
     <div className="bg-[#a08f82] text-black h-screen w-screen flex flex-col justify-center items-center gap-24">
@@ -181,15 +195,6 @@ export default function Home() {
                     className={`flex justify-center items-center flex-col`}
                     key={i}
                   >
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeCharacter(char.id);
-                      }}
-                      className="text-l h-4 bg-[#cbc3bc] w-5/6 rounded-t-lg hover:bg-[#beb5ad] cursor-pointer text-[0.6rem] font-bold z-50 text-[#636261]"
-                    >
-                      DELETE
-                    </button>
                     <div
                       className={`flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l ${
                         isActiveCharacter ? "bg-[#ece9e6]" : ""
@@ -238,24 +243,56 @@ export default function Home() {
           </div>
           <div className="fixed left-50 top-[35vh] flex row gap-6 justify-center items-center w-2/4 h-[50vh] text-[#636261]">
             <div className="flex flex-col justify-top items-center w-1/4 h-full bg-[#d5cec7] rounded shadow-l">
-              <p className="text-[11rem]">
+              <p className="text-[9rem]">
                 {sortedBattleList[currentCharacter].emoji}
               </p>
-              <p className="text-2xl -mt-10">
-                {sortedBattleList[currentCharacter].name}{" "}
+              <p className="text-2xl -mt-8">
+                {sortedBattleList[currentCharacter].name.length > 12
+                  ? `${sortedBattleList[currentCharacter].name.slice(0, 12)}..`
+                  : sortedBattleList[currentCharacter].name}
               </p>
               <div className="flex justify-top items-start w-5/6 flex-col">
                 <p className="text-[#800200] font-semibold mt-2">Health:</p>
                 <p className="ml-2">
-                  14/{sortedBattleList[currentCharacter].health}{" "}
-                </p>
-                <p className="text-[#800200] font-semibold mt-2">Initiative:</p>
-                <p className="ml-2">
-                  {sortedBattleList[currentCharacter].initiative}{" "}
+                  14/{sortedBattleList[currentCharacter].health}
                 </p>
                 <p className="text-[#800200] font-semibold mt-2">
                   Status Effects:
                 </p>
+                <div className="flex flex-col w-full gap-2 h-6">
+                  <div className="flex row w-full gap-2 h-6">
+                    <input
+                      type="text"
+                      className="h-full py-1 rounded px-3 bg-[#f3f2f0] mt-2 w-3/5"
+                      placeholder="Name"
+                      value={statusName}
+                      onChange={(event) => setStatusName(event.target.value)}
+                    />
+                    <input
+                      type="number"
+                      className="h-full py-1 rounded px-3 bg-[#f3f2f0] mt-2 w-3/5"
+                      placeholder="Turns"
+                      value={amountOfTurns}
+                      onChange={(event) => setAmountOfTurns(event.target.value)}
+                    />
+                  </div>
+                  <button
+                    className="bg-[#f3f2f0] rounded px-3 py-1 mt-2 h-6 flex justify-center items-center"
+                    onClick={addStatusEffect}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="mt-1">
+                  {sortedBattleList[currentCharacter].statusEffects &&
+                    sortedBattleList[currentCharacter].statusEffects.map(
+                      (effect: any, i: number) => (
+                        <div className="flex justify-between" key={i}>
+                          <p>{effect.name}</p> - <p>Turns {effect.laps}</p>
+                        </div>
+                      )
+                    )}
+                </div>
               </div>
             </div>
             <div className="flex flex-col justify-center items-center w-3/4 h-full bg-[#d5cec7] rounded shadow-l"></div>
