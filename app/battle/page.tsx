@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-hot-toast";
 
 export default function Home() {
@@ -68,16 +68,34 @@ export default function Home() {
   }, [Cookies.get("characters")]);
 
   let updatedBattleList: any = [];
-  const handleClick = () => {
-    setCurrentCharacter((prevCharacter) => {
-      console.log("HELLO", battleList.length);
-      if (prevCharacter === battleList.length - 1) {
-        setCurrentTurn((prevTurn) => prevTurn + 1);
+
+  const sortedBattleList = Object.values(battleList).sort(
+    (a, b) => b.initiative - a.initiative
+  );
+
+  const handleClick = (direction: string) => {
+    setCurrentCharacter((prevCharacter: any) => {
+      let nextCharacter;
+      if (direction === "next") {
+        nextCharacter = (prevCharacter + 1) % battleList.length;
+        if (nextCharacter === 0) {
+          setCurrentTurn((prevTurn) => prevTurn + 1);
+        }
+      } else if (direction === "previous") {
+        if (currentTurn === 1 && prevCharacter === 0) {
+          return prevCharacter; // Do not allow going back further
+        }
+        nextCharacter = prevCharacter - 1;
+        if (nextCharacter < 0) {
+          setCurrentTurn((prevTurn) => prevTurn - 1);
+          nextCharacter = battleList.length - 1;
+        }
       }
-      const totalCharacters = battleList.length;
-      return (prevCharacter + 1) % totalCharacters;
+      return nextCharacter;
     });
   };
+
+  console.log(battleList);
 
   return (
     <div className="bg-[#a08f82] text-black h-screen w-screen flex flex-col justify-center items-center gap-24">
@@ -152,7 +170,7 @@ export default function Home() {
             {Object.values(battleList)
               .sort((a, b) => b.initiative - a.initiative)
               .map((char, i) => {
-                const characterNumber = i + 1;
+                const characterNumber = i;
                 char.characterNumber = characterNumber;
                 updatedBattleList.push(char);
 
@@ -160,9 +178,7 @@ export default function Home() {
 
                 return (
                   <div
-                    className={`flex justify-center items-center flex-col ${
-                      isActiveCharacter ? "bg-[#3d3d3d]" : ""
-                    } `}
+                    className={`flex justify-center items-center flex-col`}
                     key={i}
                   >
                     <button
@@ -175,7 +191,9 @@ export default function Home() {
                       DELETE
                     </button>
                     <div
-                      className="flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l"
+                      className={`flex flex-col justify-center items-center w-32 h-32 bg-[#d5cec7] rounded cursor-default shadow-l ${
+                        isActiveCharacter ? "bg-[#ece9e6]" : ""
+                      } `}
                       key={i}
                     >
                       <div className="flex justify-center items-center flex-col">
@@ -190,20 +208,39 @@ export default function Home() {
                     <div className="bg-[#e3ded9] w-24 h-6 rounded-lg justify-center items-center flex text-xl -mt-3 text-[#636261]">
                       {char.initiative}
                     </div>
-                    <button onClick={handleClick}>Next Character</button>
                   </div>
                 );
               })}
           </div>
-          <div
-            className="flex flex-col justify-center items-center w-1/12 h-12 bg-[#d5cec7] rounded shadow-l transition-all hover:bg-[#c8c1b9] cursor-pointer font-semibold text-xl text-[#636261]"
-            onClick={() => {
-              setBattleStatus(!battleStatus);
-              setOpenEditor(false);
-            }}
-          >
-            TURN {currentTurn}
-            <p className="text-[7px] fixed top-[6.5vh]">CLICK TO STOP</p>
+          <div className="flex flex-row justify-center items-center h-12 w-2/12">
+            <button
+              className="text-xl font-semibold text-[#636261] bg-[#d5cec7] rounded shadow-l px-4 py-2 mr-2 h-full transition-all hover:bg-[#c8c1b9]"
+              onClick={() => handleClick("previous")}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
+            <div
+              className="flex flex-col justify-center items-center w-2/4 h-full bg-[#d5cec7] rounded shadow-l transition-all hover:bg-[#c8c1b9] cursor-pointer font-semibold text-xl text-[#636261]"
+              onClick={() => {
+                setBattleStatus(!battleStatus);
+                setOpenEditor(false);
+              }}
+            >
+              TURN {currentTurn}
+              <p className="text-[7px] fixed top-[6.5vh]">CLICK TO STOP</p>
+            </div>
+            <button
+              className="text-xl font-semibold text-[#636261] bg-[#d5cec7] rounded shadow-l px-4 py-2 ml-2 h-full transition-all hover:bg-[#c8c1b9]"
+              onClick={() => handleClick("next")}
+            >
+              <FontAwesomeIcon icon={faArrowRight} />
+            </button>
+          </div>
+          <div className="fixed left-50 top-[35vh] flex flex-col justify-center items-center w-2/4 h-[50vh] bg-[#d5cec7] rounded shadow-l">
+            {sortedBattleList[currentCharacter].name}{" "}
+            {sortedBattleList[currentCharacter].health}{" "}
+            {sortedBattleList[currentCharacter].initiative}{" "}
+            {sortedBattleList[currentCharacter].emoji}
           </div>
         </div>
       )}
