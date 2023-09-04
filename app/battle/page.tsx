@@ -9,6 +9,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-hot-toast";
 
+type Character = {
+  id: number;
+  name: string;
+  health: number;
+  initiative: number;
+  emoji: string;
+  statusEffects: any[];
+};
+
 export default function Home() {
   const [battleList, setBattleList] = useState<any[]>([]);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
@@ -39,16 +48,28 @@ export default function Home() {
       health: parseInt(health),
       initiative: parseInt(initiative),
       emoji: selectedEmoji,
+      statusEffects: [], // Initialize an empty array for status effects
     };
-    const savedCharacters = JSON.parse(Cookies.get("characters") || "[]");
-    console.log(savedCharacters);
+    const savedCharacters: Character[] = JSON.parse(
+      Cookies.get("characters") || "[]"
+    );
     savedCharacters.push(data);
-    Cookies.set("characters", JSON.stringify(savedCharacters));
+    const sortedBattleList = Object.values(savedCharacters).sort(
+      (a, b) => b.initiative - a.initiative
+    );
+    Cookies.set("characters", JSON.stringify(sortedBattleList));
     setName("");
     setHealth("");
     setInitiative("");
     setSelectedEmoji("🫥");
     toast.success("Character added!");
+    const savedBattleList = Cookies.get("characters");
+    if (savedBattleList) {
+      setBattleList(JSON.parse(savedBattleList));
+      console.log(JSON.parse(savedBattleList ?? ""));
+    } else {
+      Cookies.set("characters", JSON.stringify(battleList));
+    }
   };
 
   const removeCharacter = (id: number) => {
@@ -66,14 +87,44 @@ export default function Home() {
     if (savedBattleList) {
       setBattleList(JSON.parse(savedBattleList));
       console.log(JSON.parse(savedBattleList ?? ""));
+    } else {
+      Cookies.set("characters", JSON.stringify(sortedBattleList));
     }
-  }, [Cookies.get("characters")]);
+  }, []);
+
+  useEffect(() => {
+    Cookies.set("characters", JSON.stringify(sortedBattleList));
+  }, [battleList]);
 
   let updatedBattleList: any = [];
 
   const sortedBattleList = Object.values(battleList).sort(
     (a, b) => b.initiative - a.initiative
   );
+
+  useEffect(() => {
+    setBattleList((prevBattleList) => {
+      const updatedBattleList = prevBattleList.map((character) => {
+        const updatedCharacter = { ...character };
+        updatedCharacter.statusEffects = updatedCharacter.statusEffects.map(
+          (statusEffect: any) => {
+            const updatedStatusEffect = { ...statusEffect };
+            updatedStatusEffect.remaining =
+              updatedStatusEffect.added +
+              updatedStatusEffect.turns -
+              currentTurn;
+            return updatedStatusEffect;
+          }
+        );
+        updatedCharacter.statusEffects = updatedCharacter.statusEffects.filter(
+          (statusEffect: { turns: number }) => statusEffect.turns !== 0
+        );
+        return updatedCharacter;
+      });
+      Cookies.set("characters", JSON.stringify(updatedBattleList));
+      return updatedBattleList;
+    });
+  }, [currentCharacter]);
 
   const handleClick = (direction: string) => {
     setCurrentCharacter((prevCharacter: any) => {
@@ -105,10 +156,13 @@ export default function Home() {
     const newStatusEffect = {
       name: statusName,
       turns: parseInt(amountOfTurns),
+      remaining: parseInt(amountOfTurns),
+      added: currentTurn,
     };
     character.statusEffects.push(newStatusEffect);
     setStatusName("");
     setAmountOfTurns("");
+    Cookies.set("characters", JSON.stringify(battleList));
   };
 
   return (
@@ -170,8 +224,12 @@ export default function Home() {
           <div
             className="flex flex-col justify-center items-center w-1/12 h-12 bg-[#d5cec7] rounded shadow-l transition-all hover:bg-[#c8c1b9] cursor-pointer font-semibold text-xl text-[#636261]"
             onClick={() => {
-              setBattleStatus(!battleStatus);
-              setOpenEditor(false);
+              if (battleList[0]) {
+                setBattleStatus(!battleStatus);
+                setOpenEditor(false);
+              } else {
+                toast.error("You don't have any characters!");
+              }
             }}
           >
             START
@@ -251,7 +309,7 @@ export default function Home() {
                   ? `${sortedBattleList[currentCharacter].name.slice(0, 12)}..`
                   : sortedBattleList[currentCharacter].name}
               </p>
-              <div className="flex justify-top items-start w-5/6 flex-col">
+              <div className="flex justify-top items-start w-5/6 flex-col  overflow-scroll">
                 <p className="text-[#800200] font-semibold mt-2">Health:</p>
                 <p className="ml-2">
                   14/{sortedBattleList[currentCharacter].health}
@@ -263,34 +321,43 @@ export default function Home() {
                   <div className="flex row w-full gap-2 h-6">
                     <input
                       type="text"
-                      className="h-full py-1 rounded px-3 bg-[#f3f2f0] mt-2 w-3/5"
+                      className="h-full py-1 rounded px-2 bg-[#f3f2f0] mt-2 w-3/5"
                       placeholder="Name"
                       value={statusName}
                       onChange={(event) => setStatusName(event.target.value)}
                     />
                     <input
                       type="number"
-                      className="h-full py-1 rounded px-3 bg-[#f3f2f0] mt-2 w-3/5"
+                      className="h-full py-1 rounded px-2 bg-[#f3f2f0] mt-2 w-3/5"
                       placeholder="Turns"
                       value={amountOfTurns}
                       onChange={(event) => setAmountOfTurns(event.target.value)}
                     />
+                    <button
+                      className="bg-[#f3f2f0] rounded px-2 mt-2 h-6 flex justify-center items-center hover:bg-[#e1e0dd] transition-all"
+                      onClick={addStatusEffect}
+                    >
+                      +
+                    </button>
                   </div>
-                  <button
-                    className="bg-[#f3f2f0] rounded px-3 py-1 mt-2 h-6 flex justify-center items-center"
-                    onClick={addStatusEffect}
-                  >
-                    +
-                  </button>
                 </div>
-                <div className="mt-1">
+                <div className="mt-4 h-full w-full flex gap-1 flex-col">
                   {sortedBattleList[currentCharacter].statusEffects &&
                     sortedBattleList[currentCharacter].statusEffects.map(
-                      (effect: any, i: number) => (
-                        <div className="flex justify-between" key={i}>
-                          <p>{effect.name}</p> - <p>Turns {effect.laps}</p>
-                        </div>
-                      )
+                      (effect: any, i: number) =>
+                        effect.remaining > 0 && (
+                          <div
+                            className="flex justify-between w-full rounded px-2 bg-[#f3f2f0]"
+                            key={i}
+                          >
+                            <p>
+                              {effect.name.length > 11
+                                ? `${effect.name.slice(0, 11)}..`
+                                : effect.name}
+                            </p>
+                            <p>Turns: {effect.remaining}</p>
+                          </div>
+                        )
                     )}
                 </div>
               </div>
