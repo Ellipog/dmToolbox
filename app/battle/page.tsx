@@ -27,8 +27,12 @@ export default function Home() {
   const [initiative, setInitiative] = useState("");
   const [battleStatus, setBattleStatus] = useState(false);
   const [openEditor, setOpenEditor] = useState(false);
-  const [currentCharacter, setCurrentCharacter] = useState(0);
-  const [currentTurn, setCurrentTurn] = useState(1);
+  const [currentTurn, setCurrentTurn] = useState(
+    parseInt(Cookies.get("currentTurn") || "1")
+  );
+  const [currentCharacter, setCurrentCharacter] = useState(
+    parseInt(Cookies.get("currentCharacter") || "0")
+  );
   const [statusName, setStatusName] = useState("");
   const [amountOfTurns, setAmountOfTurns] = useState("");
 
@@ -45,7 +49,9 @@ export default function Home() {
     const data = {
       id,
       name,
+      maxHealth: parseInt(health),
       health: parseInt(health),
+      bonusHealth: 0,
       initiative: parseInt(initiative),
       emoji: selectedEmoji,
       statusEffects: [], // Initialize an empty array for status effects
@@ -53,6 +59,7 @@ export default function Home() {
     const savedCharacters: Character[] = JSON.parse(
       Cookies.get("characters") || "[]"
     );
+
     savedCharacters.push(data);
     const sortedBattleList = Object.values(savedCharacters).sort(
       (a, b) => b.initiative - a.initiative
@@ -129,10 +136,14 @@ export default function Home() {
   const handleClick = (direction: string) => {
     setCurrentCharacter((prevCharacter: any) => {
       let nextCharacter;
+      if (nextCharacter == undefined) {
+        nextCharacter = 0;
+      }
       if (direction === "next") {
         nextCharacter = (prevCharacter + 1) % battleList.length;
         if (nextCharacter === 0) {
           setCurrentTurn((prevTurn) => prevTurn + 1);
+          Cookies.set("currentTurn", (currentTurn + 1).toString());
         }
       } else if (direction === "previous") {
         if (currentTurn === 1 && prevCharacter === 0) {
@@ -141,9 +152,11 @@ export default function Home() {
         nextCharacter = prevCharacter - 1;
         if (nextCharacter < 0) {
           setCurrentTurn((prevTurn) => prevTurn - 1);
+          Cookies.set("currentTurn", (currentTurn - 1).toString());
           nextCharacter = battleList.length - 1;
         }
       }
+      Cookies.set("currentCharacter", nextCharacter.toString());
       return nextCharacter;
     });
   };
@@ -311,8 +324,13 @@ export default function Home() {
               </p>
               <div className="flex justify-top items-start w-5/6 flex-col  overflow-scroll">
                 <p className="text-[#800200] font-semibold mt-2">Health:</p>
-                <p className="ml-2">
-                  14/{sortedBattleList[currentCharacter].health}
+                <p className="ml-2 flex row gap-2">
+                  {sortedBattleList[currentCharacter].health}/
+                  {sortedBattleList[currentCharacter].maxHealth}{" "}
+                  <p className=" text-blue-400">
+                    {" "}
+                    ({sortedBattleList[currentCharacter].bonusHealth})
+                  </p>
                 </p>
                 <p className="text-[#800200] font-semibold mt-2">
                   Status Effects:
