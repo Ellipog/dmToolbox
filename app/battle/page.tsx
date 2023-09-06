@@ -380,7 +380,19 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center w-3/4 h-full bg-[#d5cec7] rounded shadow-l"></div>
+            <div className="flex row justify-center items-center w-3/4 h-full rounded shadow-l gap-4">
+              <div className="h-full w-2/5 flex flex-col gap-4">
+                <div className="flex flex-col justify-center items-center w-full h-2/4 bg-[#d5cec7] rounded shadow-l">
+                  WWW
+                </div>
+                <div className="flex flex-col justify-center items-center w-full h-2/4 bg-[#d5cec7] rounded shadow-l">
+                  WWW
+                </div>
+              </div>
+              <div className="flex flex-col justify-center items-center w-full h-full bg-[#d5cec7] rounded shadow-l">
+                WWW
+              </div>
+            </div>
           </div>
         </div>
       )}
