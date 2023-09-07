@@ -158,6 +158,10 @@ export default function Home() {
 
   useEffect(() => {
     setSavedMonsterCookies(JSON.parse(Cookies.get("savedMonsters") || "[]"));
+  }, []);
+
+  useEffect(() => {
+    setSavedMonsterCookies(JSON.parse(Cookies.get("savedMonsters") || "[]"));
   }, [monster]);
 
   if (!monster) {
