@@ -162,6 +162,11 @@ export default function Home() {
   };
 
   const addStatusEffect = () => {
+    if (!statusName || !amountOfTurns) {
+      toast.error("Please fill in all the fields");
+      return;
+    }
+    toast.success("Effect added!");
     const character = sortedBattleList[currentCharacter];
     if (!character.statusEffects) {
       character.statusEffects = []; // Initialize the statusEffects array if it doesn't exist
@@ -176,6 +181,19 @@ export default function Home() {
     setStatusName("");
     setAmountOfTurns("");
     Cookies.set("characters", JSON.stringify(battleList));
+  };
+
+  const deleteStatusEffect = (index: any) => {
+    toast.success("Effect removed!");
+    const updatedStatusEffects = [
+      ...sortedBattleList[currentCharacter].statusEffects,
+    ];
+    updatedStatusEffects.splice(index, 1);
+    sortedBattleList[currentCharacter].statusEffects = updatedStatusEffects;
+    Cookies.set("characters", JSON.stringify(sortedBattleList));
+
+    // Update the battleList state to trigger a re-render
+    setBattleList([...sortedBattleList]);
   };
 
   return (
@@ -373,7 +391,15 @@ export default function Home() {
                                 ? `${effect.name.slice(0, 11)}..`
                                 : effect.name}
                             </p>
-                            <p>Turns: {effect.remaining}</p>
+                            <div className="flex row gap-2 items-center">
+                              <p>Turns: {effect.remaining}</p>
+                              <button
+                                className="rotate-45 text-l hover:text-red-400 transition-all"
+                                onClick={() => deleteStatusEffect(i)}
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
                         )
                     )}
